@@ -5,7 +5,7 @@ module.exports = function(homebridge) {
     Service = homebridge.hap.Service;
     Characteristic = homebridge.hap.Characteristic;
 
-    homebridge.registerAccessory("homebridge-total-connect-security", "TotalConnectSecurity", TC2Accessory);
+    homebridge.registerAccessory("homebridge-total-connect-security-mod", "TotalConnectSecurityPanel", TC2Accessory);
 }
 
 /*
@@ -27,31 +27,57 @@ function TC2Accessory(log, config) {
 
     this.tcService = new TC_Module(this.log, config);
 
-    this.service = new Service.Switch(this.name);
+    //this.service = new Service.Switch(this.name);
+    this.service = new Service.SecuritySystem(this.name);
+
 
     this.service
-        .getCharacteristic(Characteristic.On)
-        .on("get", this.getState.bind(this))
-        .on("set", this.setState.bind(this));
-}
-
-TC2Accessory.prototype.getState = function(callback) {
-    this.log("Getting current state...");
-
-    this.tcService.tcIsArmed(callback);
+        .getCharacteristic(Characteristic.SecuritySystemTargetState)
+        .on("get", this.getTarget.bind(this))
+        .on("set", this.setTarget.bind(this));
+    this.service
+        .getCharacteristic(Characteristic.SecuritySystemCurrentState)
+        .on('get', this.getCurrent.bind(this));
 
 }
 
-TC2Accessory.prototype.setState = function(state, callback) {
+TC2Accessory.prototype.getTarget = function(callback) {
+    this.log("Get state of SecuritySystemTargetState was called");
 
-    var isOn = state;
+    //this.tcService.tcIsArmed(callback);
+    const currentValue = Characteristic.SecuritySystemTargetState.STAY_ARM;
+    callback(null, currentValue);
 
-    this.log("Set state to %s", isOn ? "on" : "off");
+}
 
-    if(isOn)
-        this.tcService.tcArm(callback);
-    else
-        this.tcService.tcDisarm(callback);
+
+TC2Accessory.prototype.getCurrent = function(callback) {
+  this.log("Get state of SecuritySystemCurrentState was called");
+
+  const currentValue = Characteristic.SecuritySystemTargetState.STAY_ARM;
+  callback(null, currentValue);
+
+  //this.tcService.tcIsArmed(callback);
+
+}
+TC2Accessory.prototype.setTarget = function(state, callback) {
+
+    this.log('Set State Handler was called');
+
+    this.log("Triggered Set State to Value: %s", state);
+    this.service.setCharacteristic(Characteristic.SecuritySystemCurrentState, state);
+    callback(null);
+
+    // var isOn = false;
+    // // Read the state here
+    // this.log('the state we are about to set in the index function is %s', state);
+    //
+    // //this.log("Set state to %s", isOn ? "on" : "off");
+    //
+    // if(isOn)
+    //     this.tcService.tcArm(callback);
+    // else
+    //     this.tcService.tcDisarm(callback);
 
 }
 

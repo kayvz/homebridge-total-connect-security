@@ -1,6 +1,6 @@
 {
-  "name": "homebridge-total-connect-security",
-  "version": "1.0.1",
+  "name": "homebridge-total-connect-security-mod",
+  "version": "1.0.0",
   "description": "Kayvz Total Connect plugin for homebridge: https://github.com/nfarina/homebridge",
   "license": "ISC",
   "keywords": [
